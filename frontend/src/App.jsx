@@ -18,7 +18,7 @@ export default function App() {
     if (!text.trim() || loading) return;
     clearOut(); setLoading(true);
     try {
-      const { data } = await axios.post("http://127.0.0.1:8000/predict", { text });
+      const { data } = await axios.post("https://fake-job-detector-vaz6.onrender.com/predict", { text });
       setResult(data);
     } catch { setError("Unable to connect to API. Make sure the FastAPI server is running on port 8000."); }
     setLoading(false);
@@ -28,7 +28,7 @@ export default function App() {
     if (!url.trim() || loading) return;
     clearOut(); setLoading(true);
     try {
-      const { data } = await axios.post("http://127.0.0.1:8000/predict-url", { url });
+      const { data } = await axios.post("https://fake-job-detector-vaz6.onrender.com/predict-url", { url });
       setResult(data);
     } catch { setError("Unable to connect to API. Make sure the FastAPI server is running on port 8000."); }
     setLoading(false);
