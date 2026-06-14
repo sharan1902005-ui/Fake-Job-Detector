@@ -1,22 +1,8 @@
-from newspaper import Article
 import requests
 from bs4 import BeautifulSoup
 
 
 def extract_from_url(url):
-
-    try:
-        article = Article(url)
-
-        article.download()
-
-        article.parse()
-
-        if len(article.text) > 100:
-            return article.text
-
-    except:
-        pass
 
     try:
         response = requests.get(
@@ -33,12 +19,7 @@ def extract_from_url(url):
             "html.parser"
         )
 
-        text = soup.get_text(
-            " ",
-            strip=True
-        )
-
-        return text
+        return soup.get_text(" ", strip=True)
 
     except:
         return ""
