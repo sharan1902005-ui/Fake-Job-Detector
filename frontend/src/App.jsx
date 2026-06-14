@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import IntroPage from "./components/IntroPage";
 import ResultCard from "./components/ResultCard";
+
+const API = "https://fake-job-detector-vaz6.onrender.com";
 
 export default function App() {
   const [screen, setScreen] = useState("intro"); // "intro" | "app"
@@ -14,13 +16,21 @@ export default function App() {
 
   const clearOut = () => { setResult(null); setError(""); };
 
+  const [apiOnline, setApiOnline] = useState(null);
+
+  useEffect(() => {
+    axios.get(`${API}/`)
+      .then(() => setApiOnline(true))
+      .catch(() => setApiOnline(false));
+  }, []);
+
   const analyzeText = async () => {
     if (!text.trim() || loading) return;
     clearOut(); setLoading(true);
     try {
-      const { data } = await axios.post("https://fake-job-detector-vaz6.onrender.com/predict", { text });
+      const { data } = await axios.post(`${API}/predict`, { text });
       setResult(data);
-    } catch { setError("Unable to connect to API. Make sure the FastAPI server is running on port 8000."); }
+    } catch { setError("Unable to connect to API."); }
     setLoading(false);
   };
 
@@ -28,9 +38,9 @@ export default function App() {
     if (!url.trim() || loading) return;
     clearOut(); setLoading(true);
     try {
-      const { data } = await axios.post("https://fake-job-detector-vaz6.onrender.com/predict-url", { url });
+      const { data } = await axios.post(`${API}/predict-url`, { url });
       setResult(data);
-    } catch { setError("Unable to connect to API. Make sure the FastAPI server is running on port 8000."); }
+    } catch { setError("Unable to connect to API."); }
     setLoading(false);
   };
 
@@ -51,9 +61,14 @@ export default function App() {
       <div className="grid-bg" />
 
       <div className="inner">
-        <button className="back-btn" onClick={() => { setScreen("intro"); clearOut(); }}>
-          ← Back to intro
-        </button>
+        <div className="top-bar">
+          <button className="back-btn" onClick={() => { setScreen("intro"); clearOut(); }}>
+            ← Back to intro
+          </button>
+          <div className="api-badge">
+            {apiOnline === null ? "⚪ Checking API..." : apiOnline ? "🟢 API Online" : "🔴 API Offline"}
+          </div>
+        </div>
 
         <div className="app-header">
           <div className="app-badge">
@@ -98,7 +113,7 @@ export default function App() {
               onClick={analyzeText}
               disabled={loading}
             >
-              {loading ? <><div className="loader" /> Analyzing...</> : "Analyze Job Posting"}
+              {loading ? <><div className="spinner" /> Analyzing Job Posting...</> : "Analyze Job Posting"}
             </button>
           </>
         )}
@@ -119,7 +134,7 @@ export default function App() {
               onClick={analyzeUrl}
               disabled={loading}
             >
-              {loading ? <><div className="loader" /> Analyzing...</> : "Analyze URL"}
+              {loading ? <><div className="spinner" /> Analyzing Job Posting...</> : "Analyze URL"}
             </button>
           </>
         )}
